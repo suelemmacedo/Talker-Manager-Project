@@ -1,5 +1,6 @@
 const express = require('express');
 const { readTalkers } = require('./utils/fsUtils');
+const randomToken = require('./utils/randomToken');
 
 const app = express();
 app.use(express.json());
@@ -36,4 +37,9 @@ app.get('/talker/:id', async (req, res) => {
   } catch (error) {
       return res.status(200).send([]);
   }
+});
+
+app.post('/login', (_req, res) => {
+  const token = randomToken();
+  return res.status(200).json({ token });
 });
