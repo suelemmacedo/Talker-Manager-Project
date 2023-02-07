@@ -25,4 +25,15 @@ app.get('/talker', async (_req, res) => {
   }
 });
 
-app.
+app.get('/talker/:id', async (req, res) => {
+  try {
+    const talker = await readTalkers();
+    const talker1 = talker.find(({ id }) => id === +(req.params.id));
+    if (talker1 == null) {
+      return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
+    } 
+    return res.status(200).json(talker1);
+  } catch (error) {
+    return res.status(200).send([]);
+  }
+});
