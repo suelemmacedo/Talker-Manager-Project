@@ -1,7 +1,10 @@
 const express = require('express');
 const validationLogin = require('./middlewares/validationLogin');
-const { readTalkers } = require('./utils/fsUtils');
+const { readTalkers, writeNewTalkerData } = require('./utils/fsUtils');
 const randomToken = require('./utils/randomToken');
+const { tokenValidation, nameValidation, ageValidation, 
+  talkValidation, 
+  watchedAtValidation, rateValidation } = require('./middlewares/validationNewTalker');
 
 const app = express();
 app.use(express.json());
@@ -43,4 +46,18 @@ app.get('/talker/:id', async (req, res) => {
 app.post('/login', validationLogin, (_req, res) => {
   const token = randomToken();
   return res.status(200).json({ token });
+});
+
+app.post('/talker', tokenValidation, 
+nameValidation, ageValidation, 
+talkValidation, watchedAtValidation, 
+rateValidation, async (req, res) => {
+  try {
+    const talker = await readTalkers();
+    const newTalker = { id: talker.length + 1, ...req.body };
+    await writeNewTalkerData([...talker, newTalker]);
+    return res.status(201).json(newTalker);
+  } catch (error) {
+    return res.status(200).send([]);
+  }
 });
