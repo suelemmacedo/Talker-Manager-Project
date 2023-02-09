@@ -1,14 +1,14 @@
 const tokenValidation = (req, res, next) => {
- const { authentication } = req.headers;
+  const { authorization } = req.headers;
 
-if (!authentication) {
-  return res.status(401).send({ message: 'Token não encontrado' });
-}
-const authenticationToken = authentication.length === 16 && typeof authentication === 'string';
-if (!authenticationToken) {
-  return res.status(401).send({ message: 'Token inválido' });
-}
-next();
+  if (!authorization) {
+    return res.status(401).send({ message: 'Token não encontrado' });
+  } 
+  const authorizationToken = authorization.length === 16 && typeof authorization === 'string';
+  if (!authorizationToken) {
+    return res.status(401).send({ message: 'Token inválido' });
+  }
+  next();
 }; 
 
 const nameValidation = (req, res, next) => {
@@ -63,7 +63,7 @@ const watchedAtValidation = (req, res, next) => {
 
 const rateValidation = (req, res, next) => {
   const { rate } = req.body.talk;
-  if (!rate) {
+  if (rate === undefined) {
     return res.status(400).send({ message: 'O campo "rate" é obrigatório' });
   }
   if (!Number.isInteger(rate) || (rate < 1 || rate > 5)) {
@@ -71,6 +71,7 @@ const rateValidation = (req, res, next) => {
   }
   next();
 };
+
 module.exports = {
   tokenValidation,
   nameValidation,

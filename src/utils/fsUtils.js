@@ -17,14 +17,7 @@ try {
 readTalkers();
 
 async function writeNewTalkerData(newTalker) {
-  try {
-    const oldTalkers = await readTalkers();
-    const allTalkers = JSON.stringify([...oldTalkers, newTalker]);
-
-    await fs.writeFile(path.resolve(__dirname, talkersPath, 'utf-8'), allTalkers);
-  } catch (error) {
-    return error.message;
-  } 
+   return fs.writeFile(path.resolve(__dirname, talkersPath), JSON.stringify(newTalker, null, 2));
 }
 
 module.exports = {
