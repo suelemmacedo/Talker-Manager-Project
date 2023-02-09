@@ -1,5 +1,5 @@
-const fs = require('fs').promises;
 const express = require('express');
+const fs = require('fs').promises;
 const path = require('path');
 const validationLogin = require('./middlewares/validationLogin');
 const { readTalkers, writeNewTalkerData } = require('./utils/fsUtils');
@@ -66,7 +66,7 @@ rateValidation, async (req, res) => {
   }
 });
 
-app.put('talker/:id', tokenValidation, 
+app.put('/talker/:id', tokenValidation, 
 nameValidation, ageValidation, 
 talkValidation, watchedAtValidation, 
 rateValidation, async (req, res) => {
@@ -77,9 +77,18 @@ rateValidation, async (req, res) => {
     const index = talker.findIndex((element) => element.id === +id);
     talker[index] = { id: +id, name, age, talk };
     const updateTalker = JSON.stringify(talker);
-    await fs.writeNewTalkerData(path.resolve(__dirname, talkersPath), updateTalker);
-      return res.status(200).json(talker[index]);
+    await fs.writeFile(path.resolve(__dirname, talkersPath), updateTalker);
+      return res.status(200).send(talker[index]);
   } catch (error) {
       return res.status(200).send([]);
   }
+});
+
+app.delete('/talker/:id', tokenValidation, async (req, res) => {
+  const { id } = req.params;
+  const talker = await readTalkers();
+  const index = talker.findIndex((element) => element.id === +id);
+  const updateTalker = JSON.stringify(index);
+  await fs.writeFile(path.resolve(__dirname, talkersPath), updateTalker);
+      return res.status(204).send();
 });
