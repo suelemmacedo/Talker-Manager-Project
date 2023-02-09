@@ -1,6 +1,4 @@
 const express = require('express');
-const fs = require('fs').promises;
-const path = require('path');
 const validationLogin = require('./middlewares/validationLogin');
 const { readTalkers, writeNewTalkerData } = require('./utils/fsUtils');
 const randomToken = require('./utils/randomToken');
@@ -13,8 +11,6 @@ app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
-
-const talkersPath = '../talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -76,19 +72,18 @@ rateValidation, async (req, res) => {
     const talker = await readTalkers();
     const index = talker.findIndex((element) => element.id === +id);
     talker[index] = { id: +id, name, age, talk };
-    const updateTalker = JSON.stringify(talker);
-    await fs.writeFile(path.resolve(__dirname, talkersPath), updateTalker);
+    await writeNewTalkerData(talker);
       return res.status(200).send(talker[index]);
   } catch (error) {
-      return res.status(200).send([]);
+    return res.status(500).send({ message: error.message });
   }
 });
 
 app.delete('/talker/:id', tokenValidation, async (req, res) => {
   const { id } = req.params;
   const talker = await readTalkers();
-  const index = talker.findIndex((element) => element.id === +id);
-  const updateTalker = JSON.stringify(index);
-  await fs.writeFile(path.resolve(__dirname, talkersPath), updateTalker);
+  const talkerFilter = talker.filter((element) => element.id !== +id);
+  /* console.log(talkerFilter); */
+  await writeNewTalkerData(talkerFilter);
       return res.status(204).send();
 });
