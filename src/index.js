@@ -1,4 +1,6 @@
+const fs = require('fs').promises;
 const express = require('express');
+const path = require('path');
 const validationLogin = require('./middlewares/validationLogin');
 const { readTalkers, writeNewTalkerData } = require('./utils/fsUtils');
 const randomToken = require('./utils/randomToken');
@@ -11,6 +13,8 @@ app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
+
+const talkersPath = '../talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -45,7 +49,7 @@ app.get('/talker/:id', async (req, res) => {
 
 app.post('/login', validationLogin, (_req, res) => {
   const token = randomToken();
-  return res.status(200).json({ token });
+    return res.status(200).json({ token });
 });
 
 app.post('/talker', tokenValidation, 
@@ -56,8 +60,26 @@ rateValidation, async (req, res) => {
     const talker = await readTalkers();
     const newTalker = { id: talker.length + 1, ...req.body };
     await writeNewTalkerData([...talker, newTalker]);
-    return res.status(201).json(newTalker);
+      return res.status(201).json(newTalker);
   } catch (error) {
-    return res.status(200).send([]);
+      return res.status(200).send([]);
+  }
+});
+
+app.put('talker/:id', tokenValidation, 
+nameValidation, ageValidation, 
+talkValidation, watchedAtValidation, 
+rateValidation, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const talker = await readTalkers();
+    const index = talker.findIndex((element) => element.id === +id);
+    talker[index] = { id: +id, name, age, talk };
+    const updateTalker = JSON.stringify(talker);
+    await fs.writeNewTalkerData(path.resolve(__dirname, talkersPath), updateTalker);
+      return res.status(200).json(talker[index]);
+  } catch (error) {
+      return res.status(200).send([]);
   }
 });

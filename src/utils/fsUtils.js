@@ -8,9 +8,9 @@ try {
   const data = await fs.readFile(path.resolve(__dirname, talkersPath));
   const talkers = JSON.parse(data);
   
-  return talkers;
+    return talkers;
 } catch (error) {
-  return error.message;
+    return error.message;
 }
 }
 
