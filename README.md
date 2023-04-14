@@ -1,6 +1,6 @@
 <div align="start">
 
-<img src="https://img.shields.io/static/v1?label=Talker Manager System &color=red&style=for-the-badge&logo=github"/>
+<img src="https://img.shields.io/static/v1?label=Projeto&message=Talker Manager &color=red&style=for-the-badge&logo=github"/>
 
 ---   
 
